@@ -276,6 +276,15 @@ def upsert_measurements(
         )
         for row in rows
     ]
+    
+    # Deduplicate by unique constraint key (source_type, station_id, observed_at, indicator_code)
+    # Keep the last occurrence to ensure most recent data wins
+    seen_keys = {}
+    for item in payload:
+        key = (item[0], item[1], item[2], item[3])  # source_type, station_id, observed_at, indicator_code
+        seen_keys[key] = item
+    payload = list(seen_keys.values())
+    
     if not payload:
         return 0
 

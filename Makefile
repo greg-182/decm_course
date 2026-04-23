@@ -10,7 +10,8 @@ RESOLVE_HOST_WORKSPACE = \
 	inspected_path="$$(sudo docker inspect "$$(hostname)" --format '{{range .Mounts}}{{if eq .Destination "$(WORKSPACE_DIR)"}}{{println .Source}}{{end}}{{end}}' 2>/dev/null | head -n 1)"; \
 	if [ -n "$$inspected_path" ]; then \
 		path="$$inspected_path"; \
-	elif [ -z "$$path" ]; then \
+	fi; \
+	if [ -z "$$path" ]; then \
 		echo "HOST_WORKSPACE is not set." >&2; \
 		exit 1; \
 	elif printf "%s" "$$path" | grep -Eq "^/.*[A-Za-z]:[\\\\/]"; then \
@@ -156,7 +157,7 @@ warehouse-status-json: init
 	@.venv/bin/python -m etl.airviro.cli warehouse-status --json --indicator-limit $(STATUS_INDICATOR_LIMIT) --audit-limit $(STATUS_AUDIT_LIMIT)
 
 devcontainer-join-course-network: init
-	@project_name="$$(grep -E '^COMPOSE_PROJECT_NAME=' "$(ENV_FILE)" | cut -d '=' -f2-)"; \
+	@project_name="$$(grep -E '^COMPOSE_PROJECT_NAME=' "$(ENV_FILE)" | cut -d '=' -f2- | tr -d '\r\n')"; \
 	if [ -z "$$project_name" ]; then project_name="course"; fi; \
 	network_name="$${project_name}_default"; \
 	container_id="$$(hostname)"; \
@@ -177,7 +178,7 @@ devcontainer-join-course-network: init
 devcontainer-leave-course-network:
 	@project_name="course"; \
 	if [ -f "$(ENV_FILE)" ]; then \
-		project_name="$$(grep -E '^COMPOSE_PROJECT_NAME=' "$(ENV_FILE)" | cut -d '=' -f2-)"; \
+		project_name="$$(grep -E '^COMPOSE_PROJECT_NAME=' "$(ENV_FILE)" | cut -d '=' -f2- | tr -d '\r\n')"; \
 	fi; \
 	if [ -z "$$project_name" ]; then project_name="course"; fi; \
 	network_name="$${project_name}_default"; \
