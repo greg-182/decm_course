@@ -190,7 +190,7 @@ pgduckdb-bootstrap: up-airflow
 	@$(COMPOSE) $(PROFILES_AIRFLOW) exec -T postgres bash /docker-entrypoint-initdb.d/02-enable-pgduckdb.sh
 
 devcontainer-join-course-network: init
-	@project_name="$$(grep -E '^COMPOSE_PROJECT_NAME=' "$(ENV_FILE)" | cut -d '=' -f2-)"; \
+	@project_name="$$(grep -E '^COMPOSE_PROJECT_NAME=' "$(ENV_FILE)" | cut -d '=' -f2- | tr -d '\r\n')"; \
 	if [ -z "$$project_name" ]; then project_name="course"; fi; \
 	network_name="$${project_name}_default"; \
 	container_id="$$(hostname)"; \
@@ -211,7 +211,7 @@ devcontainer-join-course-network: init
 devcontainer-leave-course-network:
 	@project_name="course"; \
 	if [ -f "$(ENV_FILE)" ]; then \
-		project_name="$$(grep -E '^COMPOSE_PROJECT_NAME=' "$(ENV_FILE)" | cut -d '=' -f2-)"; \
+		project_name="$$(grep -E '^COMPOSE_PROJECT_NAME=' "$(ENV_FILE)" | cut -d '=' -f2- | tr -d '\r\n')"; \
 	fi; \
 	if [ -z "$$project_name" ]; then project_name="course"; fi; \
 	network_name="$${project_name}_default"; \
